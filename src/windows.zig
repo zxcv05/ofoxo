@@ -90,22 +90,19 @@ pub fn deinit(this: Windows, allocator: std.mem.Allocator) void {
     }
 }
 
-pub fn find_window_containing_cursor(this: Windows) ?*const Window {
+pub fn find_window_containing(this: Windows, x_pos: isize, y_pos: isize) ?*const Window {
+    if (x_pos < 0 or y_pos < 0) return null;
+
+    const x: u32 = @intCast(x_pos);
+    const y: u32 = @intCast(y_pos);
+
     for (this.windows) |*window| {
-        const cursor = window.backend.getCursorPos();
-
-        // if (cursor.xpos < 0 or cursor.ypos < 0) continue;
-
-        const x: i32 = @intFromFloat(cursor.xpos);
-        const y: i32 = @intFromFloat(cursor.ypos);
-
-        if (x >= 0 and y >= 0 and x <= window.bounds.width and y <= window.bounds.height) {
-            std.debug.print("\r" ++ "\x1b[2K" ++ "Found window: {any} with cursor {any}", .{ window.bounds, cursor });
+        if (x >= window.bounds.x and
+            y >= window.bounds.y and
+            x <= window.bounds.x + window.bounds.width and
+            y <= window.bounds.y + window.bounds.height)
             return window;
-        }
     }
-
-    std.debug.print("\r" ++ "\x1b[2K" ++ "No window found", .{});
 
     return null;
 }

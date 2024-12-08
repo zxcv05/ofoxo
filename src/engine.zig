@@ -51,23 +51,39 @@ pub fn deinit(this: Engine) void {
     }
 }
 
-pub fn run(this: Engine) !void {
+pub fn run(this: *Engine) !void {
     const sprite_fbo = zgl.genFramebuffer();
+
+    const root_window = this.windows.windows[0];
+
+    this.state.position.x = root_window.bounds.x + root_window.bounds.width / 2;
+    this.state.position.y = root_window.bounds.y + root_window.bounds.height / 2;
 
     while (!this.windows.should_close()) {
         if (this.windows.is_key(glfw.Key.escape, glfw.Action.press)) break;
         defer glfw.pollEvents();
 
-        const draw_window = this.windows.find_window_containing_cursor() orelse continue;
+        const cursor = root_window.backend.getCursorPos();
+        const cursor_position = State.Position{
+            .x = @as(isize, @intFromFloat(cursor.xpos)) + root_window.bounds.x,
+            .y = @as(isize, @intFromFloat(cursor.ypos)) + root_window.bounds.y,
+        };
 
-        const cursor = draw_window.backend.getCursorPos();
-        const cursor_x: usize = @intFromFloat(@max(cursor.xpos, 0));
-        const cursor_y: usize = @intFromFloat(@max(cursor.ypos, 0));
+        this.state.update(cursor_position);
 
         const sprite = this.state.get_sprite();
         sprite_fbo.texture2D(.read_buffer, .color0, .@"2d", this.spritesheets[sprite.n].texture, 0);
 
         // Rendering
+
+        const draw_window = this.windows.find_window_containing(this.state.position.x, this.state.position.y);
+        std.debug.print("\r" ++ "\x1b[2K" ++ "{d},{d} - {d},{d} - {*}", .{
+            cursor_position.x,
+            cursor_position.y,
+            this.state.position.x,
+            this.state.position.y,
+            draw_window,
+        });
 
         for (this.windows.windows) |*window| {
             glfw.makeContextCurrent(window.backend);
@@ -77,17 +93,24 @@ pub fn run(this: Engine) !void {
 
             defer window.backend.swapBuffers();
 
-            if (window == draw_window) {
+            if (draw_window == null) continue;
+
+            if (window == draw_window.?) {
+                const draw_position_x = this.state.position.x - window.bounds.x;
+                const draw_position_y = this.state.position.y - window.bounds.y;
+
+                if (draw_position_x < 0 or draw_position_y < 0) continue;
+
                 zgl.blitFramebuffer(
                     sprite.x,
                     sprite.y + Spritesheet.Sprite.height,
                     sprite.x + Spritesheet.Sprite.width,
                     sprite.y,
 
-                    cursor_x,
-                    window.bounds.height - cursor_y,
-                    cursor_x + Spritesheet.Sprite.width,
-                    window.bounds.height - cursor_y + Spritesheet.Sprite.height,
+                    @as(usize, @intCast(draw_position_x)),
+                    window.bounds.height - @as(usize, @intCast(draw_position_y)),
+                    @as(usize, @intCast(draw_position_x)) + Spritesheet.Sprite.width,
+                    window.bounds.height - @as(usize, @intCast(draw_position_y)) + Spritesheet.Sprite.height,
 
                     .{ .color = true, .stencil = true, .depth = true },
                     .nearest,

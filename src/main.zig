@@ -32,7 +32,7 @@ pub fn main() !void {
     defer glfw.terminate();
 
     log.debug("engine.init(...)", .{});
-    const engine = try Engine.init(alloc);
+    var engine = try Engine.init(alloc);
     defer engine.deinit();
 
     log.debug("zgl.loadExtensions(...)", .{});
