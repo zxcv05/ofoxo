@@ -1,0 +1,31 @@
+.{
+    .name = "ofoxo",
+    .version = "0.1.0",
+    .minimum_zig_version = "0.13.0",
+
+    .dependencies = .{
+        .jdz = .{
+            .url = "git+https://github.com/joadnacer/jdz_allocator/#fefa1851875adfcb0e2bf6534c9d04e304be093f",
+            .hash = "12205cc579d7cd5d7419014d984c23fc0a410decc43176d87a4545189d7f1f69622d",
+        },
+        .zgl = .{
+            .url = "git+https://github.com/zxcv05/zgl#cdf0cb232ef0e5c60a77ed6ed4065d27eeddef38",
+            .hash = "122025854587015926af5ae675e249ab8feeb38f60a74e45a73834d06a54bf34a452",
+        },
+        .glfw = .{
+            .url = "git+https://github.com/griush/zig-glfw#fd8aa407a461f02887e2f905ac1ce5e0b1ea13fe",
+            .hash = "1220852e3e3bf07492d465a2f61146613e5be82f9cc26b3889af98b76b0e18d29aa7",
+        },
+        .zimg = .{
+            .url = "git+https://github.com/zigimg/zigimg#d9dbbe22b5f7b5f1f4772169ed93ffeed8e8124d",
+            .hash = "122013646f7038ecc71ddf8a0d7de346d29a6ec40140af57f838b0a975c69af512b0",
+        },
+    },
+    .paths = .{
+        "src",
+        "build.zig",
+        "build.zig.zon",
+        "readme.md",
+        "LICENSE",
+    },
+}
