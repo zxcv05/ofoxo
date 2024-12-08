@@ -96,8 +96,11 @@ pub fn run(this: *Engine) !void {
             if (draw_window == null) continue;
 
             if (window == draw_window.?) {
-                const draw_position_x = this.state.position.x - window.bounds.x;
-                const draw_position_y = this.state.position.y - window.bounds.y;
+                const draw_offset_x: isize = Spritesheet.Sprite.height / 2;
+                const draw_offset_y: isize = Spritesheet.Sprite.width / 2;
+
+                const draw_position_x = this.state.position.x - window.bounds.x - draw_offset_x;
+                const draw_position_y = this.state.position.y - window.bounds.y + draw_offset_y;
 
                 if (draw_position_x < 0 or draw_position_y < 0) continue;
 
