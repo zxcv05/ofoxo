@@ -25,9 +25,9 @@ activity: Activity = .idle,
 idle_time: usize = 0, // TODO: make non-frame dependent
 
 pub fn update(this: *State, cursor: Position) void {
-    const cross_x = cursor.x - this.position.x;
-    const cross_y = cursor.y - this.position.y;
-    const distance = @sqrt(@as(f64, @floatFromInt(cross_x * cross_x + cross_y * cross_y)));
+    const cross_x: f64 = @floatFromInt(cursor.x - this.position.x);
+    const cross_y: f64 = @floatFromInt(cursor.y - this.position.y);
+    const distance = @sqrt(cross_x * cross_x + cross_y * cross_y);
 
     // Change activity if needed
     if (this.activity == .running and distance < START_IDLE_RADIUS)
@@ -39,8 +39,8 @@ pub fn update(this: *State, cursor: Position) void {
 
     // Move toward cursor
     if (this.activity == .running) {
-        this.position.x += @intFromFloat(@as(f64, @floatFromInt(cross_x)) / distance * SPEED);
-        this.position.y += @intFromFloat(@as(f64, @floatFromInt(cross_y)) / distance * SPEED);
+        this.position.x += @intFromFloat(cross_x / distance * SPEED);
+        this.position.y += @intFromFloat(cross_y / distance * SPEED);
     }
 
     if (this.activity == .idle) this.idle_time += 1 else this.idle_time = 0;
