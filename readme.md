@@ -15,5 +15,9 @@ fox follow mouse (real)
 # Install
 `# zig build --prefix /usr/`
 
+# Troubleshooting
+- When building under windows, if you get a TlsInitializationError, you probably have a broken zig installation. Try using winget
+- If ofoxo makes all of your monitors blurry, add an x11 class rule for "ofoxo" to disable any effects
+
 # Contributing
 No special steps. Happy hacking!
