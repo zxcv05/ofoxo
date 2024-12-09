@@ -12,7 +12,7 @@ pub fn build(b: *std.Build) !void {
 
     const exe = b.addExecutable(.{
         .root_source_file = b.path("src/main.zig"),
-        .name = "main",
+        .name = "ofoxo",
 
         .optimize = optimize,
         .target = target,
