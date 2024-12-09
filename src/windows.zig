@@ -26,9 +26,8 @@ const Window = struct {
             if (root_window) |window| window.backend else null,
             .{
                 .opengl_profile = .opengl_core_profile,
-                .opengl_forward_compat = false,
-                .context_version_major = 4,
-                .context_version_minor = 4,
+                .context_version_major = 3,
+                .context_version_minor = 2,
 
                 .position_x = @intCast(bounds.x),
                 .position_y = @intCast(bounds.y),
