@@ -59,6 +59,9 @@ pub fn run(this: *Engine) !void {
     this.state.position.x = root_window.bounds.x + root_window.bounds.width / 2;
     this.state.position.y = root_window.bounds.y + root_window.bounds.height / 2;
 
+    this.state.start_idle_ts = std.time.milliTimestamp();
+    this.state.start_awake_ts = std.time.milliTimestamp();
+
     while (!this.windows.should_close()) {
         if (this.windows.is_key(glfw.Key.escape, glfw.Action.press)) break;
         defer glfw.pollEvents();
@@ -77,13 +80,6 @@ pub fn run(this: *Engine) !void {
         // Rendering
 
         const draw_window = this.windows.find_window_containing(this.state.position.x, this.state.position.y);
-        std.debug.print("\r" ++ "\x1b[2K" ++ "{d},{d} - {d},{d} - {*}", .{
-            cursor_position.x,
-            cursor_position.y,
-            this.state.position.x,
-            this.state.position.y,
-            draw_window,
-        });
 
         for (this.windows.windows) |*window| {
             glfw.makeContextCurrent(window.backend);
