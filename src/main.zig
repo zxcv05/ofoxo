@@ -3,14 +3,15 @@ const jdz = @import("jdz");
 const zgl = @import("zgl");
 const glfw = @import("glfw");
 
-const log = std.log.scoped(.main);
+const cli = @import("cli.zig");
 
+const Context = @import("context.zig");
 const Engine = @import("engine.zig");
+
+const log = std.log.scoped(.main);
 
 var outer = jdz.JdzAllocator(.{}).init();
 var alloc = outer.allocator();
-
-const opengl_error_handling = zgl.ErrorHandling.log;
 
 fn glfw_proc_address(p: glfw.GLProc, proc: [:0]const u8) ?zgl.binding.FunctionPointer {
     _ = p;
@@ -24,6 +25,10 @@ fn glfw_error_callback(error_code: glfw.ErrorCode, description: [:0]const u8) vo
 pub fn main() !void {
     log.info("Hello world", .{});
 
+    log.debug("cli.parse_cli(...)", .{});
+    var context = Context{};
+    if (!try cli.parse_cli(alloc, &context)) return;
+
     glfw.setErrorCallback(glfw_error_callback);
 
     log.debug("glfw.init(...)", .{});
@@ -34,7 +39,7 @@ pub fn main() !void {
     defer glfw.terminate();
 
     log.debug("engine.init(...)", .{});
-    var engine = try Engine.init(alloc);
+    var engine = try Engine.init(alloc, context);
     defer engine.deinit();
 
     log.debug("zgl.loadExtensions(...)", .{});

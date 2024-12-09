@@ -4,6 +4,7 @@ const glfw = @import("glfw");
 const zimg = @import("zimg");
 
 const Spritesheet = @import("spritesheet.zig");
+const Context = @import("context.zig");
 const Windows = @import("windows.zig");
 const State = @import("state.zig");
 const Engine = @This();
@@ -12,20 +13,22 @@ const log = std.log.scoped(.engine);
 
 allocator: std.mem.Allocator,
 
-windows: Windows,
 spritesheet: *Spritesheet,
+context: Context,
+windows: Windows,
 
 state: State = .{},
 
-pub fn init(allocator: std.mem.Allocator) !Engine {
-    const windows = try Windows.init(allocator);
+pub fn init(allocator: std.mem.Allocator, context: Context) !Engine {
+    const windows = try Windows.init(allocator, context);
     const spritesheet = try allocator.create(Spritesheet);
 
     return Engine{
         .allocator = allocator,
 
-        .windows = windows,
         .spritesheet = spritesheet,
+        .context = context,
+        .windows = windows,
     };
 }
 

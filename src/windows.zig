@@ -1,6 +1,7 @@
 const std = @import("std");
 const glfw = @import("glfw");
 
+const Context = @import("context.zig");
 const Windows = @This();
 
 const log = std.log.scoped(.window);
@@ -61,7 +62,22 @@ const Window = struct {
 
 windows: []Window,
 
-pub fn init(allocator: std.mem.Allocator) !Windows {
+pub fn init(allocator: std.mem.Allocator, context: Context) !Windows {
+    if (context.primary_display_only) {
+        const window_container = try allocator.alloc(Window, 1);
+
+        const monitor = glfw.Monitor.getPrimary() orelse return error.NoPrimaryDisplay;
+        const workarea = monitor.getWorkarea();
+        const bounds = Bounds{ .x = workarea.x, .y = workarea.y, .width = workarea.width, .height = workarea.height };
+
+        window_container[0] = try Window.init(bounds, null);
+        log.debug("Window ({any}) created on primary display", .{window_container[0].bounds});
+
+        glfw.makeContextCurrent(window_container[0].backend);
+
+        return Windows{ .windows = window_container };
+    }
+
     const monitors = try glfw.Monitor.getAll(allocator);
     defer allocator.free(monitors);
 
