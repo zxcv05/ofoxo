@@ -64,6 +64,8 @@ pub fn run(this: *Engine) !void {
     this.state.start_awake_ts = std.time.milliTimestamp();
 
     while (!this.windows.should_close()) {
+        const loop_start_ts = std.time.nanoTimestamp();
+
         if (this.windows.is_key(glfw.Key.escape, glfw.Action.press)) break;
         defer glfw.pollEvents();
 
@@ -118,5 +120,13 @@ pub fn run(this: *Engine) !void {
                 );
             }
         }
+
+        const loop_end_ts = std.time.nanoTimestamp();
+        const loop_delta: u64 = @intCast(loop_end_ts - loop_start_ts);
+
+        const target = std.time.ns_per_s / 30;
+        if (loop_delta >= target) continue;
+
+        std.time.sleep(target - loop_delta);
     }
 }
