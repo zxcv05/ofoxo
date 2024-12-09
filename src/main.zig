@@ -10,6 +10,8 @@ const Engine = @import("engine.zig");
 var outer = jdz.JdzAllocator(.{}).init();
 var alloc = outer.allocator();
 
+const opengl_error_handling = zgl.ErrorHandling.log;
+
 fn glfw_proc_address(p: glfw.GLProc, proc: [:0]const u8) ?zgl.binding.FunctionPointer {
     _ = p;
     return glfw.getProcAddress(proc);
