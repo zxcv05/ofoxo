@@ -51,7 +51,6 @@ pub fn deinit(this: Engine) void {
 
 pub fn run(this: *Engine) !void {
     const sprite_fbo = zgl.genFramebuffer();
-    sprite_fbo.texture2D(.read_buffer, .color0, .@"2d", this.spritesheet.texture, 0);
 
     const root_window = this.windows.windows[0];
 
@@ -72,6 +71,7 @@ pub fn run(this: *Engine) !void {
         };
 
         this.state.update(cursor_position);
+        sprite_fbo.texture2D(.read_buffer, .color0, .@"2d", this.spritesheet.texture, 0);
 
         const sprite = this.state.get_sprite();
 
