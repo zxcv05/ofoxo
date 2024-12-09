@@ -12,7 +12,7 @@ pub const STOP_RUNNING_RADIUS = 25;
 pub const START_RUNNING_RADIUS = 150;
 
 pub const AWAKE_TIME_START_IDLE = 5 * std.time.ms_per_s;
-pub const IDLE_TIME_SLEEP_THRESHOLD = 15 * std.time.ms_per_s;
+pub const IDLE_TIME_START_SLEEP = 15 * std.time.ms_per_s;
 
 pub const Activity = enum {
     idle,
@@ -53,7 +53,7 @@ pub fn update(this: *State, cursor: Position) void {
         },
         .idle => if (distance > START_RUNNING_RADIUS) {
             this.activity = .running;
-        } else if (timestamp > this.start_idle_ts + IDLE_TIME_SLEEP_THRESHOLD) {
+        } else if (timestamp > this.start_idle_ts + IDLE_TIME_START_SLEEP) {
             this.activity = .sleeping;
         },
         .sleeping => if (distance > WAKE_UP_RADIUS) {
