@@ -71,6 +71,7 @@ pub fn run(this: *Engine) !void {
         };
 
         this.state.update(cursor_position);
+        // TODO(debug): Rue had opengl error here: "Invalid operation"
         sprite_fbo.texture2D(.read_buffer, .color0, .@"2d", this.spritesheet.texture, 0);
 
         const sprite = this.state.get_sprite();

@@ -11,6 +11,7 @@ pub const WAKE_UP_RADIUS = 500;
 pub const STOP_RUNNING_RADIUS = 25;
 pub const START_RUNNING_RADIUS = 150;
 
+pub const SPRITE_TIME_ALLOW_CHANGE = 125;
 pub const AWAKE_TIME_START_IDLE = 5 * std.time.ms_per_s;
 pub const IDLE_TIME_START_SLEEP = 15 * std.time.ms_per_s;
 
@@ -35,9 +36,12 @@ pub const Position = struct {
 };
 
 position: Position = .{ .x = 0, .y = 0 },
+sprite: u8 = 0x00,
+
 activity: Activity = .idle,
 start_idle_ts: i64 = 0,
 start_awake_ts: i64 = 0,
+sprite_change_ts: i64 = 0,
 
 pub fn update(this: *State, cursor: Position) void {
     const timestamp = std.time.milliTimestamp();
@@ -77,17 +81,21 @@ pub fn update(this: *State, cursor: Position) void {
             if (delta_x > 0) .east else .west
         else if (delta_y < 0) .north else .south;
     }
-}
 
-pub fn get_sprite(this: State) Spritesheet.Sprite {
-    const timestamp = std.time.milliTimestamp();
-
-    const packed_offset: u8 = @intCast(switch (this.activity) {
+    // TODO: only allow texture change after x millis (fixes perfect diagonal texture flashing)
+    const new_sprite: u8 = @intCast(switch (this.activity) {
         .idle, .awake => 0x00 + @abs(@mod(@divFloor(timestamp, std.time.ms_per_s), 4) - 2),
         .sleeping => 0x70 + @mod(@divFloor(@abs(timestamp), std.time.ms_per_s * SLEEP_SEC_PER_FRAME), 4),
         .running => @intFromEnum(this.position.dir) +
             @mod(@divFloor(@abs(timestamp), std.time.ms_per_s / SPEED), 4),
     });
 
-    return Sprite.from_packed_offset(packed_offset);
+    if (new_sprite != this.sprite and timestamp > this.sprite_change_ts + SPRITE_TIME_ALLOW_CHANGE) {
+        this.sprite = new_sprite;
+        this.sprite_change_ts = timestamp;
+    }
+}
+
+pub fn get_sprite(this: State) Spritesheet.Sprite {
+    return Sprite.from_packed_offset(this.sprite);
 }
