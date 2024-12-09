@@ -82,7 +82,6 @@ pub fn update(this: *State, cursor: Position) void {
         else if (delta_y < 0) .north else .south;
     }
 
-    // TODO: only allow texture change after x millis (fixes perfect diagonal texture flashing)
     const new_sprite: u8 = @intCast(switch (this.activity) {
         .idle, .awake => 0x00 + @abs(@mod(@divFloor(timestamp, std.time.ms_per_s), 4) - 2),
         .sleeping => 0x70 + @mod(@divFloor(@abs(timestamp), std.time.ms_per_s * SLEEP_SEC_PER_FRAME), 4),
