@@ -4,6 +4,7 @@ fox follow mouse (real)
 # Dependencies
 - (dev) Zig v0.13.0
 - OpenGL 4.4
+- GLFW
 
 # Build
 `$ zig build`
