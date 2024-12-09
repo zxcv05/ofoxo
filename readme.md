@@ -19,6 +19,7 @@ fox follow mouse (real)
 - When building under windows, if you get a TlsInitializationError, you probably have a broken zig installation. Try using winget
 - If ofoxo makes all of your monitors blurry, add an x11 class rule for "ofoxo" to disable any effects
 - If ofoxo fails to run with "OpenGL failure: invalid operation", try building with ReleaseSmall or ReleaseFast
+- i3wm may have issues with mouse passthrough, no known workaround
 
 # Contributing
 No special steps. Happy hacking!
