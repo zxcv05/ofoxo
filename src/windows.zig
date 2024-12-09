@@ -32,6 +32,9 @@ const Window = struct {
                 .position_x = @intCast(bounds.x),
                 .position_y = @intCast(bounds.y),
 
+                .wayland_app_id = "zxcv.ofoxo",
+                .x11_class_name = "ofoxo",
+
                 .transparent_framebuffer = true,
                 .mouse_passthrough = true,
                 .doublebuffer = true,
