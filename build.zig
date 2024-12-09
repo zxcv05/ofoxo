@@ -22,8 +22,6 @@ pub fn build(b: *std.Build) !void {
 
     exe.link_gc_sections = true;
 
-    exe.linkSystemLibrary("glfw");
-
     exe.root_module.addImport("jdz", jdz_dep.module("jdz_allocator"));
     exe.root_module.addImport("zgl", zgl_dep.module("zgl"));
     exe.root_module.addImport("glfw", glfw_dep.module("zig-glfw"));
