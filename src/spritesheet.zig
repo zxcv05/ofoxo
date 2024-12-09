@@ -4,24 +4,19 @@ const zimg = @import("zimg");
 
 pub const Spritesheet = @This();
 
-pub const NUM_SPRITESHEETS = 1;
-
 pub const Sprite = struct {
     pub const width = 32;
     pub const height = 32;
 
     x: usize,
     y: usize,
-    n: usize, // Which spritesheet the sprite lives in
 
-    pub inline fn from_packed_offset(definition: u12) Sprite {
+    pub inline fn from_packed_offset(definition: u8) Sprite {
         const x = (definition & 0x00f) >> 0;
         const y = (definition & 0x0f0) >> 4;
-        const n = (definition & 0xf00) >> 8;
         return Sprite{
             .x = x * Sprite.width,
             .y = y * Sprite.height,
-            .n = n,
         };
     }
 };

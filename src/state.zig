@@ -21,11 +21,11 @@ pub const Activity = enum {
     sleeping,
 };
 
-pub const Direction = enum(u12) {
-    north = 0x020,
-    east = 0x030,
-    south = 0x040,
-    west = 0x050,
+pub const Direction = enum(u8) {
+    north = 0x20,
+    east = 0x30,
+    south = 0x40,
+    west = 0x50,
 };
 
 pub const Position = struct {
@@ -82,9 +82,9 @@ pub fn update(this: *State, cursor: Position) void {
 pub fn get_sprite(this: State) Spritesheet.Sprite {
     const timestamp = std.time.milliTimestamp();
 
-    const packed_offset: u12 = @intCast(switch (this.activity) {
-        .idle, .awake => 0x000 + @abs(@mod(@divFloor(timestamp, std.time.ms_per_s), 4) - 2),
-        .sleeping => 0x070 + @mod(@divFloor(@abs(timestamp), std.time.ms_per_s * SLEEP_SEC_PER_FRAME), 4),
+    const packed_offset: u8 = @intCast(switch (this.activity) {
+        .idle, .awake => 0x00 + @abs(@mod(@divFloor(timestamp, std.time.ms_per_s), 4) - 2),
+        .sleeping => 0x70 + @mod(@divFloor(@abs(timestamp), std.time.ms_per_s * SLEEP_SEC_PER_FRAME), 4),
         .running => @intFromEnum(this.position.dir) +
             @mod(@divFloor(@abs(timestamp), std.time.ms_per_s / SPEED), 4),
     });

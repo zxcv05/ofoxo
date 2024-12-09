@@ -13,19 +13,19 @@ const log = std.log.scoped(.engine);
 allocator: std.mem.Allocator,
 
 windows: Windows,
-spritesheets: []Spritesheet,
+spritesheet: *Spritesheet,
 
 state: State = .{},
 
 pub fn init(allocator: std.mem.Allocator) !Engine {
     const windows = try Windows.init(allocator);
-    const spritesheets = try allocator.alloc(Spritesheet, Spritesheet.NUM_SPRITESHEETS);
+    const spritesheet = try allocator.create(Spritesheet);
 
     return Engine{
         .allocator = allocator,
 
         .windows = windows,
-        .spritesheets = spritesheets,
+        .spritesheet = spritesheet,
     };
 }
 
@@ -36,23 +36,22 @@ pub fn setup_gl() void {
     zgl.blendFunc(.src_alpha, .one_minus_src_alpha);
 }
 
-pub fn load_spritesheets(this: Engine) !void {
-    this.spritesheets[0] = try Spritesheet.from_embedded(this.allocator, @embedFile("assets/spitesheet-1.png"));
+pub fn load_spritesheet(this: Engine) !void {
+    this.spritesheet.* = try Spritesheet.from_embedded(this.allocator, @embedFile("assets/spitesheet.png"));
 
-    log.debug("Spritesheets loaded", .{});
+    log.debug("Spritesheet loaded", .{});
 }
 
 pub fn deinit(this: Engine) void {
     this.windows.deinit(this.allocator);
 
-    defer this.allocator.free(this.spritesheets);
-    for (this.spritesheets) |*spritesheet| {
-        spritesheet.deinit(this.allocator);
-    }
+    defer this.allocator.destroy(this.spritesheet);
+    this.spritesheet.deinit(this.allocator);
 }
 
 pub fn run(this: *Engine) !void {
     const sprite_fbo = zgl.genFramebuffer();
+    sprite_fbo.texture2D(.read_buffer, .color0, .@"2d", this.spritesheet.texture, 0);
 
     const root_window = this.windows.windows[0];
 
@@ -75,7 +74,6 @@ pub fn run(this: *Engine) !void {
         this.state.update(cursor_position);
 
         const sprite = this.state.get_sprite();
-        sprite_fbo.texture2D(.read_buffer, .color0, .@"2d", this.spritesheets[sprite.n].texture, 0);
 
         // Rendering
 

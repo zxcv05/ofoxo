@@ -42,8 +42,8 @@ pub fn main() !void {
     log.debug("engine.setup_gl()", .{});
     Engine.setup_gl();
 
-    log.debug("engine.load_sprites()", .{});
-    try engine.load_spritesheets();
+    log.debug("engine.load_spritesheet()", .{});
+    try engine.load_spritesheet();
 
     log.debug("engine.run()", .{});
     try engine.run();
