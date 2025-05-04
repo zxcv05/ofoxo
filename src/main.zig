@@ -1,5 +1,4 @@
 const std = @import("std");
-const jdz = @import("jdz");
 const zgl = @import("zgl");
 const glfw = @import("glfw");
 
@@ -10,32 +9,32 @@ const Engine = @import("engine.zig");
 
 const log = std.log.scoped(.main);
 
-var outer = jdz.JdzAllocator(.{}).init();
-var alloc = outer.allocator();
-
-fn glfw_proc_address(p: glfw.GLProc, proc: [:0]const u8) ?zgl.binding.FunctionPointer {
+fn glfw_proc_address(p: glfw.GLproc, proc: [:0]const u8) ?zgl.binding.FunctionPointer {
     _ = p;
     return glfw.getProcAddress(proc);
 }
 
-fn glfw_error_callback(error_code: glfw.ErrorCode, description: [:0]const u8) void {
+fn glfw_error_callback(error_code: glfw.ErrorCode, description: [*:0]u8) callconv(.c) void {
     std.log.err("GLFW: {}: {s}", .{ error_code, description });
 }
 
 pub fn main() !void {
+    var outer: std.heap.GeneralPurposeAllocator(.{}) = .init;
+    const alloc = outer.allocator();
+
     log.info("Hello world", .{});
 
     log.debug("cli.parse_cli(...)", .{});
     var context = Context{};
     if (!try cli.parse_cli(alloc, &context)) return;
 
-    glfw.setErrorCallback(glfw_error_callback);
+    _ = glfw.setErrorCallback(glfw_error_callback);
 
     log.debug("glfw.init(...)", .{});
-    if (!glfw.init(.{ .platform = .any })) {
-        log.err("failed to init GLFW: {?s}", .{glfw.getErrorString()});
-        return error.glfw;
-    }
+    glfw.init() catch |e| {
+        log.err("failed to init GLFW: {s}", .{@errorName(e)});
+        return e;
+    };
     defer glfw.terminate();
 
     log.debug("engine.init(...)", .{});
@@ -43,7 +42,7 @@ pub fn main() !void {
     defer engine.deinit();
 
     log.debug("zgl.loadExtensions(...)", .{});
-    const proc: glfw.GLProc = undefined;
+    const proc: glfw.GLproc = undefined;
     try zgl.loadExtensions(proc, glfw_proc_address);
 
     log.debug("engine.setup_gl()", .{});

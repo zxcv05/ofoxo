@@ -5,9 +5,8 @@ pub fn build(b: *std.Build) !void {
     const optimize = b.standardOptimizeOption(.{});
 
     const dep_args = .{ .target = target, .optimize = optimize };
-    const jdz_dep = b.dependency("jdz", dep_args);
     const zgl_dep = b.dependency("zgl", dep_args);
-    const glfw_dep = b.dependency("glfw", dep_args);
+    const zglfw_dep = b.dependency("zglfw", dep_args);
     const zimg_dep = b.dependency("zimg", dep_args);
 
     const exe = b.addExecutable(.{
@@ -22,9 +21,8 @@ pub fn build(b: *std.Build) !void {
 
     exe.link_gc_sections = true;
 
-    exe.root_module.addImport("jdz", jdz_dep.module("jdz_allocator"));
     exe.root_module.addImport("zgl", zgl_dep.module("zgl"));
-    exe.root_module.addImport("glfw", glfw_dep.module("zig-glfw"));
+    exe.root_module.addImport("glfw", zglfw_dep.module("glfw"));
     exe.root_module.addImport("zimg", zimg_dep.module("zigimg"));
 
     const run = b.addRunArtifact(exe);

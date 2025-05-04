@@ -57,8 +57,8 @@ pub fn run(this: *Engine) !void {
 
     const root_window = this.windows.windows[0];
 
-    this.state.position.x = root_window.bounds.x + root_window.bounds.width / 2;
-    this.state.position.y = root_window.bounds.y + root_window.bounds.height / 2;
+    this.state.position.x = root_window.workarea.x + @as(isize, @intCast(@divFloor(root_window.workarea.w, 2)));
+    this.state.position.y = root_window.workarea.y + @as(isize, @intCast(@divFloor(root_window.workarea.h, 2)));
 
     this.state.start_idle_ts = std.time.milliTimestamp();
     this.state.start_awake_ts = std.time.milliTimestamp();
@@ -66,13 +66,17 @@ pub fn run(this: *Engine) !void {
     while (!this.windows.should_close()) {
         const loop_start_ts = std.time.nanoTimestamp();
 
-        if (this.windows.is_key(glfw.Key.escape, glfw.Action.press)) break;
+        if (this.windows.is_key(glfw.KeyEscape, glfw.Press)) break;
         defer glfw.pollEvents();
 
-        const cursor = root_window.backend.getCursorPos();
+        // shorthand: cursor_[xy]
+        var cx: f64 = undefined;
+        var cy: f64 = undefined;
+        glfw.getCursorPos(root_window.backend, &cx, &cy);
+
         const cursor_position = State.Position{
-            .x = @as(isize, @intFromFloat(cursor.xpos)) + root_window.bounds.x,
-            .y = @as(isize, @intFromFloat(cursor.ypos)) + root_window.bounds.y,
+            .x = @as(isize, @intFromFloat(cx)) + root_window.workarea.x,
+            .y = @as(isize, @intFromFloat(cy)) + root_window.workarea.y,
         };
 
         this.state.update(cursor_position);
@@ -90,7 +94,7 @@ pub fn run(this: *Engine) !void {
             zgl.clearColor(0.0, 0.0, 0.0, 0.0);
             zgl.clear(.{ .color = true });
 
-            defer window.backend.swapBuffers();
+            defer glfw.swapBuffers(window.backend);
 
             if (draw_window == null) continue;
 
@@ -98,8 +102,8 @@ pub fn run(this: *Engine) !void {
                 const draw_offset_x: isize = Spritesheet.Sprite.height / 2;
                 const draw_offset_y: isize = Spritesheet.Sprite.width / 2;
 
-                const draw_position_x = this.state.position.x - window.bounds.x - draw_offset_x;
-                const draw_position_y = this.state.position.y - window.bounds.y + draw_offset_y;
+                const draw_position_x = this.state.position.x - window.workarea.x - draw_offset_x;
+                const draw_position_y = this.state.position.y - window.workarea.y + draw_offset_y;
 
                 if (draw_position_x < 0 or draw_position_y < 0) continue;
 
@@ -110,9 +114,9 @@ pub fn run(this: *Engine) !void {
                     sprite.y,
 
                     @as(usize, @intCast(draw_position_x)),
-                    window.bounds.height - @as(usize, @intCast(draw_position_y)),
+                    @as(usize, @intCast(window.workarea.h)) - @as(usize, @intCast(draw_position_y)),
                     @as(usize, @intCast(draw_position_x)) + Spritesheet.Sprite.width,
-                    window.bounds.height - @as(usize, @intCast(draw_position_y)) + Spritesheet.Sprite.height,
+                    @as(usize, @intCast(window.workarea.h)) - @as(usize, @intCast(draw_position_y)) + Spritesheet.Sprite.height,
 
                     .{ .color = true, .stencil = true, .depth = true },
                     .nearest,
